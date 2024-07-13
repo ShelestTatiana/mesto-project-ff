@@ -1,7 +1,7 @@
 import '../pages/index.css'; 
 import { initialCards } from './cards';
 import { openModal, closeModal, closeOverlay } from './modal';
-import { createCard, addLikeActive } from './card';
+import { createCard, addLikeActive, deleteCard } from './card';
 
 // @todo: Темплейт карточки 
 export const cardTemplate = document.querySelector('#card-template').content; 
@@ -32,12 +32,6 @@ const formForImage = popupAdd.querySelector('.popup__form');
 const placeInput = formForImage.querySelector('.popup__input_type_card-name');
 const linkInput = formForImage.querySelector('.popup__input_type_url');
 
-
-// @todo: Функция удаления карточки 
-function deleteCard(evt) { 
-    evt.target.closest('.card').remove(); 
-}; 
- 
 // @todo: Вывести карточки на страницу 
 initialCards.forEach(function(item) { 
     placesList.append(createCard(item, deleteCard, openImg, addLikeActive)); 
@@ -64,18 +58,9 @@ function openImg(item) {
 
 //закрыть форму by x
 closeButtonPopup.forEach((button) => {
-    button.addEventListener('click', () => {
-        closeModal(popupEdit);
-        closeModal(popupAdd);
-        closeModal(popupImg);
-    });
-});
-
-//закрыть форму by "сохранить"
-submitButton.forEach((button) => {
-    button.addEventListener('click', () => {
-        closeModal(popupEdit);
-        closeModal(popupAdd);
+    button.addEventListener('click', (evt) => {
+        const popup = evt.target.closest('.popup');
+        closeModal(popup);
     });
 });
 
@@ -85,13 +70,14 @@ closeOverlay(popupAdd);
 closeOverlay(popupImg);
 
 //редактирование имени и информации о себе
-function handleFormSubmit(evt) {
+function editAccount(evt) {
     evt.preventDefault(); 
     profileTitle.textContent = nameInput.value;
     profileDescription.textContent = jobInput.value;
+    closeModal(popupEdit);
 }
 
-formElement.addEventListener('submit', handleFormSubmit);
+formElement.addEventListener('submit', editAccount);
 
 // добавить новую картинку
 function addNewCard(evt) {
@@ -107,6 +93,7 @@ function addNewCard(evt) {
     );
     placesList.prepend(addCard);//вставить картинку в начало
     formForImage.reset();//очистить форму
+    closeModal(popupAdd);//закрыть форму
 };
 
 formForImage.addEventListener('submit', addNewCard);
