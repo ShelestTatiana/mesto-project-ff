@@ -1,0 +1,25 @@
+.edit-avatar {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 29px 0 0;
+  }
+  
+  .overlay {
+    content: "";
+    background: black;
+    opacity: 10%;
+    z-index: 1;
+    width: 120px;
+    height: 120px;
+    background-size: cover;
+    background-position: center;
+    position: absolute;
+  }
+  
+  .overlay:hover {
+    background: transparent url("/src/images/edit-avatar.svg") center no-repeat;
+    background-color: black;
+    opacity: 80%;
+    cursor: pointer;
+  }
