@@ -1,11 +1,18 @@
-import { cardTemplate } from "./index";
 import { putLikeRequest, deleteLikeRequest } from "./api";
 
+// @todo: Темплейт карточки 
+const cardTemplate = document.querySelector('#card-template').content; 
+
+//клонирование шаблона карточки
+const getCardTemplate = () => {
+    return cardTemplate.querySelector('.card').cloneNode(true);
+};
 
 //функция создания карточки 
 export function createCard(item, openImg, deleteCard, putDeleteLikes, userId) {
     //клонирование шаблона карточки
-    const cardItem = cardTemplate.querySelector('.card').cloneNode(true); 
+    const cardItem = getCardTemplate();
+
     //получение элементов карточки
     const deleteButton = cardItem.querySelector('.card__delete-button'); 
     const newCard = cardItem.querySelector('.card__image');

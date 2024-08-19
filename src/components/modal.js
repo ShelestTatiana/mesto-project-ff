@@ -1,3 +1,5 @@
+import { clearValidation } from './validation';
+
 //открытие попап
 export const openModal = (popupElement) => {
     popupElement.classList.add('popup_is-opened');

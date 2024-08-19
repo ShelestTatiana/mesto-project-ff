@@ -3,10 +3,8 @@ import { openModal, closeModal, closeOverlay } from './modal';
 import { createCard, putDeleteLikes } from './card';
 import { enableValidation, clearValidation, showInputError, toggleButtonState } from './validation';
 import { getUserRequest, getCardsRequest, patchProfileRequest, postAddCardRequest, headCheckUrl, deleteCardRequest, patchAvatarRequest } from './api';
+import { renderLoading } from './utils';
 
-// @todo: Темплейт карточки 
-export const cardTemplate = document.querySelector('#card-template').content; 
- 
 // @todo: DOM узлы 
 const placesList = document.querySelector('.places__list'); 
 
@@ -19,10 +17,10 @@ const submitButton = document.querySelectorAll('.popup__button');//уточни�
 
 //переменные для формы редатирования имени и информации
 const popupEdit = document.querySelector('.popup_type_edit');
-const formElement = popupEdit.querySelector('.popup__form');
-const buttonFormSubmit = formElement.querySelector('.popup__button');
-const nameInput = formElement.querySelector('.popup__input_type_name');
-const jobInput = formElement.querySelector('.popup__input_type_description');
+const formEditProfile = popupEdit.querySelector('.popup__form');
+const buttonFormSubmit = formEditProfile.querySelector('.popup__button');
+const nameInput = formEditProfile.querySelector('.popup__input_type_name');
+const jobInput = formEditProfile.querySelector('.popup__input_type_description');
 const profileTitle = document.querySelector('.profile__title');
 const profileDescription = document.querySelector('.profile__description');
 const profileImage = document.querySelector('.profile__image');
@@ -60,15 +58,6 @@ const validationConfig = {
 //мой пользователь
 export let userId;
 
-//рендеринг
-function renderLoading(isLoading, buttonElement) {
-    if (isLoading) {
-        buttonElement.textContent = 'Сохранение...';
-    } else {
-        buttonElement.textContent = 'Сохранить';
-    }
-};
-
 //вызов валидации формы
 enableValidation(validationConfig);
 
@@ -95,44 +84,45 @@ openButtonPopupEdit.addEventListener('click', () => {
     nameInput.value = profileTitle.textContent;
     jobInput.value = profileDescription.textContent;
     openModal(popupEdit);//открыть модальное окно
-    clearValidation(formElement, validationConfig);//очистить ошибки валидации
+    clearValidation(formEditProfile, validationConfig);//очистить ошибки валидации при успешной загрузке
 });
 
 //слушатель формы редактирования учетки
-formElement.addEventListener('submit', editAccount);
-
+formEditProfile.addEventListener('submit', editAccount);
 
 // редактирование аватара
-function editAvatar(evt) {
-    evt.preventDefault();
-    headCheckUrl(inputAvatarForm.value)
-    .then(() => {
-        renderLoading(true, buttonSubmitAvatar);
-        const avatarValue = inputAvatarForm.value;
-        patchAvatarRequest(avatarValue)
-        .then((avatarData) => {
-            profileImage.style.backgroundImage = `url(${avatarData.avatar})`;
-            closeModal(popupEditAvatar);
-      })
-    .catch((error) => {
-        console.log(`Ошибка при загрузке данных: ${error}`);
-      })
-      .finally(() => {
-        renderLoading(false, buttonSubmitAvatar);
-      })
-    .catch((error) => {
-        showInputError(formAvatar, inputAvatarForm, error, validationConfig);
-        toggleButtonState(inputAvatarForm, buttonSubmitAvatar, validationConfig);
-    });
-}
-)};
+    function editAvatar(evt) {
+        evt.preventDefault();
+        console.log("Функция editAvatar вызвана");
+        headCheckUrl(inputAvatarForm.value)
+        .then(() => {
+            console.log("URL проверен");
+            renderLoading(true, buttonSubmitAvatar);
+            const avatarValue = inputAvatarForm.value;
+            patchAvatarRequest(avatarValue)
+            .then((avatarData) => {
+                console.log("Блок .then вызван", avatarData);
+                profileImage.style.backgroundImage = `url(${avatarData.avatar})`;
+                closeModal(popupEditAvatar);
+          })
+        .catch((error) => {
+            console.log(`Ошибка при загрузке данных: ${error}`);
+          })
+          .finally(() => {
+            renderLoading(false, buttonSubmitAvatar);
+          })
+        .catch((error) => {
+            showInputError(formAvatar, inputAvatarForm, error, validationConfig);
+            toggleButtonState(inputAvatarForm, buttonSubmitAvatar, validationConfig);
+        });
+    }
+    )};
 
 //открыть попап редактирования аватара
 avatarContainer.addEventListener('click', () => {
-    console.log("click");
     formAvatar.reset();
     openModal(popupEditAvatar);
-    clearValidation(popupEditAvatar, validationConfig);//очистить ошибки валидации
+    clearValidation(formAvatar, validationConfig) // Очистить ошибки валидации 
 });
 
 //слушатель редактирования аватара
@@ -145,8 +135,9 @@ export function addNewCard(evt) {
     postAddCardRequest(placeInput.value, linkInput.value)
       .then((item) => {
         placesList.prepend(createCard(item, openImg, deleteCard, putDeleteLikes, userId));
-        closeModal(popupAdd);//закрыть форму
         formForImage.reset();
+        clearValidation(formForImage, validationConfig); // очистить ошибки валидации при успешном сабмите
+        closeModal(popupAdd);//закрыть форму
       })
     .catch((error) => {
         console.log(`Ошибка при загрузке данных: ${error}`);
@@ -158,11 +149,8 @@ export function addNewCard(evt) {
 
 //обработчик открытия попапа добавления карточки
 openButtonPopupAdd.addEventListener('click', () => {
-    // console.log("click");
     formForImage.reset();
-    clearValidation(formForImage, validationConfig);//очистить ошибки валидации
     openModal(popupAdd);
-    // console.log('Попап должен открыться');
 });
 
 //слушатель добавления карточки
